@@ -11,25 +11,16 @@ export const getSingleNoteData = async (firebaseUid: string, noteId: string) => 
     const note = await Note.findById(noteId)
         .select(
             `
-        title
-        description
-        subject
-        category
-        tags
-        course
-        university
-        semester
-        language
-        file
-        contentType
-        uploader
-        stats
-        createdAt
-        updatedAt
-        publishedAt
-    `
+            title description subject branch category collegeName tags course
+            university semester language file contentType uploader
+            stats createdAt updatedAt publishedAt isPublic publishStatus
+            noteVerificationStatus moderation
+        `
         )
-        .populate('uploader', `firstName lastName userName avatar verificationStatus`)
+        .populate(
+            'uploader',
+            `firstName lastName userName avatarUrl isEmailVerified userVerificationStatus`
+        )
         .lean();
 
     if (!note) {

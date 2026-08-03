@@ -2,7 +2,7 @@ import mongoose, { Document } from 'mongoose';
 import { NoteModerationFlagsType } from '../constants/noteModerationFlags.constant';
 import { NoteCategoryType } from '../constants/noteCategory.constant';
 import { NoteContentType } from '../constants/noteContentType.constant';
-import { NoteStatusType } from '../constants/noteStatus.constant';
+import { NoteStatusType, NoteVerificationStatusType } from '../constants/noteStatus.constant';
 import { IUser } from '@/modules/users/types/user.types';
 
 export interface IPopulatedNote extends Omit<INote, 'uploader'> {
@@ -13,11 +13,13 @@ export interface INote extends Document {
     title: string;
     description: string;
     subject: string;
+    branch: string;
     category: NoteCategoryType;
     contentType: NoteContentType;
-    tags: string[];
+    tags?: string[];
     course?: string;
-    university: string;
+    university?: string;
+    collegeName?:string;
     semester?: number;
     language: string;
 
@@ -35,7 +37,7 @@ export interface INote extends Document {
 
     uploader: mongoose.Types.ObjectId;
     isPublic: boolean;
-    status: NoteStatusType;
+    publishStatus: NoteStatusType;
     publishedAt: Date;
 
     stats: {
@@ -51,6 +53,12 @@ export interface INote extends Document {
         conversionRate: number;
         lastViewedAt: Date;
     };
+
+    submittedForReviewAt: Date;
+    approvedAt:Date;
+    rejectedAt:Date;
+    rejectionReason:String;
+    noteVerificationStatus:NoteVerificationStatusType;
 
     moderation: {
         reportCount: number;

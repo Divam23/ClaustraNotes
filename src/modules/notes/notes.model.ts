@@ -1,7 +1,10 @@
 import mongoose, { Schema } from 'mongoose';
 import { NOTE_CATEGORY_ENUM } from './constants/noteCategory.constant';
 import { NOTE_CONTENT_TYPE_ENUM } from './constants/noteContentType.constant';
-import { NOTE_STATUS_ENUM } from './constants/noteStatus.constant';
+import {
+    NOTE_PUBLISH_STATUS_ENUM,
+    NOTE_VERIFICATION_STATUS_ENUM,
+} from './constants/noteStatus.constant';
 import { MODERATION_FLAGS_ENUM } from './constants/noteModerationFlags.constant';
 import { INote } from './types/note.types';
 
@@ -21,7 +24,7 @@ const NoteSchema = new Schema<INote>(
             type: String,
             trim: true,
             maxlength: 1000,
-            default:""
+            default: '',
         },
 
         subject: {
@@ -30,6 +33,14 @@ const NoteSchema = new Schema<INote>(
             trim: true,
             minlength: 2,
             maxlength: 100,
+            index: true,
+        },
+
+        branch: {
+            type: String,
+            trim: true,
+            minLength: 2,
+            maxLength: 200,
             index: true,
         },
 
@@ -51,6 +62,11 @@ const NoteSchema = new Schema<INote>(
         tags: {
             type: [String],
             default: [],
+            validate: {
+                validator: (tags: string[]) =>
+                    tags.length <= 15 && tags.every((t) => t.length <= 30),
+                message: 'Too many tags or tag too long',
+            },
             set: (tags: string[]) => tags.map((tag) => tag.toLowerCase().trim()),
         },
 
@@ -60,19 +76,26 @@ const NoteSchema = new Schema<INote>(
             trim: true,
             maxlength: 100,
             index: true,
+            required: true,
         },
-
+        collegeName: {
+            type: String,
+            trim: true,
+            minLength: 2,
+            maxLength: 200,
+            index: true,
+        },
         university: {
             type: String,
             trim: true,
-            maxlength: 100,
-            default:""
+            minLength: 5,
+            maxlength: 200,
         },
 
         semester: {
             type: Number,
             min: 1,
-            max: 10,
+            max: 11,
             index: true,
         },
 
@@ -93,9 +116,9 @@ const NoteSchema = new Schema<INote>(
                     message: 'Invalid file URL',
                 },
             },
-            storagePath:{
-                type:String,
-                required:true
+            storagePath: {
+                type: String,
+                required: true,
             },
 
             mimeType: {
@@ -121,18 +144,20 @@ const NoteSchema = new Schema<INote>(
             pageCount: {
                 type: Number,
                 min: 0,
+                default: 0,
             },
 
             readingTime: {
                 type: Number,
                 min: 0,
+                default: 0,
             },
         },
 
         // Content extraction
         extractedText: {
             type: String,
-            select:false
+            select: false,
         },
 
         // Ownership
@@ -149,15 +174,37 @@ const NoteSchema = new Schema<INote>(
             default: true,
         },
 
-        status: {
+        publishStatus: {
             type: String,
-            enum: NOTE_STATUS_ENUM,
-            default: 'published',
+            enum: NOTE_PUBLISH_STATUS_ENUM,
+            default: 'draft',
             index: true,
         },
 
         publishedAt: {
             type: Date,
+        },
+
+        submittedForReviewAt: {
+            type: Date,
+        },
+
+        approvedAt: {
+            type: Date,
+        },
+
+        rejectedAt: {
+            type: Date,
+        },
+
+        rejectionReason: {
+            type: String,
+        },
+
+        noteVerificationStatus: {
+            type: String,
+            enum: NOTE_VERIFICATION_STATUS_ENUM,
+            default: 'unverified',
         },
 
         // Analytics & stats
@@ -185,10 +232,10 @@ const NoteSchema = new Schema<INote>(
                 default: 0,
                 min: 0,
             },
-            commentsCount:{
-                type:Number,
-                default:0,
-                min:0
+            commentsCount: {
+                type: Number,
+                default: 0,
+                min: 0,
             },
 
             sharesCount: {
@@ -248,16 +295,8 @@ const NoteSchema = new Schema<INote>(
                     type: String,
                     enum: MODERATION_FLAGS_ENUM,
                 },
+
             ],
-
-            moderatedBy: {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: 'User',
-            },
-
-            moderatedAt: {
-                type: Date,
-            },
         },
     },
     {
@@ -281,7 +320,7 @@ NoteSchema.index({
 
 NoteSchema.index({
     createdAt: -1,
-    status: 1,
+    verificationStatus: 1,
     isPublic: 1,
 });
 
@@ -303,7 +342,7 @@ NoteSchema.index({
 });
 
 NoteSchema.index({
-    status: 1,
+    publishStatus: 1,
     isPublic: 1,
 });
 
@@ -314,6 +353,10 @@ NoteSchema.set('toJSON', {
 
 NoteSchema.set('toObject', {
     virtuals: true,
+});
+
+NoteSchema.virtual('isPublic').get(function () {
+    return this.publishStatus === 'published';
 });
 
 // Methods
@@ -328,12 +371,37 @@ NoteSchema.methods.calculateEngagementScore = function () {
     return Math.min(100, Math.round(score / 10));
 };
 
-
 // Hooks
 NoteSchema.pre('save', async function () {
     this.stats = this.stats || {};
 
     this.stats.engagementScore = this.calculateEngagementScore();
+});
+
+NoteSchema.pre('validate', function () {
+    const status = this.noteVerificationStatus;
+
+    if (status === 'verified') {
+        if (!this.approvedAt) {
+            throw new Error('verified notes must have approvedAt set');
+        }
+        if (this.rejectedAt || this.rejectionReason) {
+            throw new Error('verified notes cannot carry rejection info');
+        }
+    }
+
+    if (status === 'pending_review') {
+        if (!this.submittedForReviewAt) {
+            throw new Error('pending_review notes must have submittedForReviewAt set');
+        }
+        if (this.approvedAt || this.rejectedAt) {
+            throw new Error('pending_review notes cannot have approvedAt/rejectedAt set');
+        }
+    }
+
+    if (status === 'unverified' && this.approvedAt && !this.rejectedAt) {
+        throw new Error('unverified notes with approvedAt must also have rejectedAt set');
+    }
 });
 
 const Note = mongoose.model<INote>('Note', NoteSchema);

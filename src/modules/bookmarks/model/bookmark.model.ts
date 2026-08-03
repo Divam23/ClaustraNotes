@@ -5,7 +5,7 @@ import { BOOKMARK_ENTITY_TYPE_ENUM } from '../constants/bookmarkEntityType.const
 const BookmarkSchema = new Schema<IBookmark>(
     {
         user: {
-            type: mongoose.Types.ObjectId,
+            type: mongoose.Schema.Types.ObjectId,
             ref: 'User',
             required: true,
         },
@@ -17,9 +17,7 @@ const BookmarkSchema = new Schema<IBookmark>(
 
         targetType: {
             type: String,
-
             enum: BOOKMARK_ENTITY_TYPE_ENUM,
-
             required: true,
         },
     },
@@ -40,5 +38,4 @@ BookmarkSchema.index(
 );
 
 const Bookmark = mongoose.model('Bookmark', BookmarkSchema);
-
 export default Bookmark;

@@ -1,7 +1,7 @@
 import User from '@/modules/users/models/users.model';
 import Note from '../notes.model';
 import { ApiError } from '@/shared/utils/ApiError';
-import { updateSingleNoteDto } from '../dto/updateSingleNote.dto';
+import { UpdateSingleNoteDto } from '../dto/updateSingleNote.dto';
 import mongoose from 'mongoose';
 
 export const updateSingleNote = async ({
@@ -11,7 +11,7 @@ export const updateSingleNote = async ({
 }: {
     firebaseUid: string;
     noteId: string;
-    updatedNoteDataDetails: updateSingleNoteDto;
+    updatedNoteDataDetails: UpdateSingleNoteDto;
 }) => {
     if (!mongoose.Types.ObjectId.isValid(noteId)) {
         throw new ApiError(400, 'Invalid Note Id');
@@ -23,20 +23,26 @@ export const updateSingleNote = async ({
         throw new ApiError(404, 'User not found');
     }
 
+    
     if (Object.keys(updatedNoteDataDetails).length === 0)
         throw new ApiError(400, 'No update details found');
-
+    
     const note = await Note.findById(noteId);
-
+    
     if (!note) throw new ApiError(404, 'No note found with this noteId');
-
+    
     if (note.uploader.toString() !== user._id.toString()) {
         throw new ApiError(403, 'You cannot update this note');
     }
-
+    
+    if (note.noteVerificationStatus === 'pending_review') {
+        throw new ApiError(403,
+            'This note is pending verification review and cannot be edited until the review is complete.'
+        );
+    }
     //returns document after update
     const updatedNote = await Note.findByIdAndUpdate(noteId, updatedNoteDataDetails, {
-        returnDocument: 'after',
+        new:true,
         runValidators: true,
     });
 

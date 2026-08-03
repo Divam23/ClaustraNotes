@@ -1,10 +1,20 @@
 export const NOTE_CATEGORY_ENUM = [
   'lecture_notes',
-  'previous_year_paper',
-  'summaries',
-  'assignments',
+  'handwritten',
+  'previous_year_questions',
+  'revision_notes',
+  'assignment',
   'lab_manual',
-  'others',
+  'lab_record',
+  'summary',
+  'cheat_sheet',
+  'presentation',
+  'ebook',
+  'syllabus',
+  'question_bank',
+  'practice_set',
+  'project_report',
+  'others'
 ] as const;
 
 export type NoteCategoryType = (typeof NOTE_CATEGORY_ENUM)[number];
