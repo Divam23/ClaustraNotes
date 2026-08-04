@@ -23,8 +23,8 @@ export const deleteSingleNote = async (firebaseUid: string, noteId: string) => {
 
     //try deleting file
     try {
-        if (note.file?.url) {
-            await firebaseStorageProvider.deleteFile(note.file.url);
+        if (note.file?.storagePath) {
+            await firebaseStorageProvider.deleteFile(note.file.storagePath);
         }
 
         if (note.file?.thumbnailUrl) {

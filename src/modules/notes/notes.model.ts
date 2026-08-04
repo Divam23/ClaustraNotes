@@ -106,16 +106,6 @@ const NoteSchema = new Schema<INote>(
 
         // File metadata
         file: {
-            url: {
-                type: String,
-                required: true,
-                validate: {
-                    validator: function (v: string) {
-                        return /^https?:\/\/.+/.test(v);
-                    },
-                    message: 'Invalid file URL',
-                },
-            },
             storagePath: {
                 type: String,
                 required: true,
@@ -139,6 +129,11 @@ const NoteSchema = new Schema<INote>(
                     },
                     message: 'Invalid thumbnail URL',
                 },
+            },
+
+            canDownload: {
+                type: Boolean,
+                default: false
             },
 
             pageCount: {
@@ -320,7 +315,7 @@ NoteSchema.index({
 
 NoteSchema.index({
     createdAt: -1,
-    verificationStatus: 1,
+    noteVerificationStatus: 1,
     isPublic: 1,
 });
 
@@ -355,9 +350,6 @@ NoteSchema.set('toObject', {
     virtuals: true,
 });
 
-NoteSchema.virtual('isPublic').get(function () {
-    return this.publishStatus === 'published';
-});
 
 // Methods
 NoteSchema.methods.calculateEngagementScore = function () {

@@ -7,18 +7,28 @@ configDotenv();
 class FirebaseStorageProvider implements StorageProvider {
   private bucket = storage;
 
+  
   async uploadFile(file: Buffer, path: string, mimeType: string): Promise<string> {
     const fileUpload = this.bucket.file(path);
     await fileUpload.save(file,{
-        metadata:{
-            contentType:mimeType
-        }
+      metadata:{
+        contentType:mimeType
+      }
     })
+    
+    return path;
+  }
+  
+  async generateSignedDownloadUrl(path: string): Promise<string> {
+    const file = this.bucket.file(path);
+    const expiryMinutes = Number(process.env.SIGNED_URL_EXPIRY_MINUTES ?? 5);
 
-    await fileUpload.makePublic();
-    const publicFilePath = `${process.env.PUBLIC_FILE_PATH_INITIAL}/${this.bucket.name}/${path}`;
+    const [signedUrl] = await file.getSignedUrl({
+      action: "read",
+      expires: Date.now() + expiryMinutes * 60 * 60
+    });
 
-    return publicFilePath
+    return signedUrl;
   }
 
   async deleteFile(path: string): Promise<void> {

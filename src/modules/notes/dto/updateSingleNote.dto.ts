@@ -12,5 +12,6 @@ export interface UpdateSingleNoteDto{
     university?:string,
     semester?:number,
     language?:string,
+    canDownload?:boolean;
     isPublic?:boolean,
 } 

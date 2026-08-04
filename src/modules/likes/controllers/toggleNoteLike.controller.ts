@@ -3,7 +3,6 @@ import { Request, Response } from 'express';
 import { toggleLike } from '../services/toggleLike.service';
 import { ApiError } from '@/shared/utils/ApiError';
 import { ApiResponse } from '@/shared/utils/ApiResponse';
-import { EntityType } from '../constants/entityType.constant';
 
 export const toggleNoteLikeController = asyncHandler(async (req: Request, res: Response) => {
     if (!req.user) {
@@ -12,6 +11,8 @@ export const toggleNoteLikeController = asyncHandler(async (req: Request, res: R
 
     const firebaseUid = req.user.uid;
     const noteId = req.params.noteId as string;
+
+
 
     const response = await toggleLike(
         firebaseUid,

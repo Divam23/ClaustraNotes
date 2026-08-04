@@ -35,19 +35,11 @@ export const createNote = async ({
 
     const path = generateNoteFilePath(user._id.toString(), uploadedFile.originalname);
 
-    let fileUrl = '';
-
     try {
-        fileUrl = await firebaseStorageProvider.uploadFile(
-            uploadedFile.buffer,
-            path,
-            uploadedFile.mimetype
-        );
 
         const note = await Note.create({
             ...noteData,
             file: {
-                url: fileUrl,
                 storagePath: path,
                 mimeType: uploadedFile.mimetype,
                 size: uploadedFile.size,
@@ -58,9 +50,9 @@ export const createNote = async ({
 
         return note;
     } catch (error) {
-        if (fileUrl) {
+        if (path) {
             try {
-                await firebaseStorageProvider.deleteFile(fileUrl);
+                await firebaseStorageProvider.deleteFile(path);
             } catch (cleanupError) {
                 console.error('Rollback failed', cleanupError);
                 throw new ApiError(500, "Internal server error", [cleanupError])

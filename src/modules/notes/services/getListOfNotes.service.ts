@@ -40,9 +40,6 @@ export const getNoteList = async (options: GetNoteListOptions) => {
     if (options.semester) {
         filters.semester = options.semester;
     }
-    if (options.semester) {
-        filters.semester = options.semester;
-    }
     if (options.category) {
         filters.category = options.category;
     }

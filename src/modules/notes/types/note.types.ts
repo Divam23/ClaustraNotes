@@ -24,11 +24,11 @@ export interface INote extends Document {
     language: string;
 
     file: {
-        url: string;
         storagePath:string;
         mimeType: string;
         size: number;
         thumbnailUrl: string;
+        canDownload: boolean;
         pageCount: number;
         readingTime: number;
     };

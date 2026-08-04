@@ -28,6 +28,7 @@ export const mapNoteListResponse = ({
             language: note.language,
             contentType: note.contentType,
             file: {
+                canDownload: note.file.canDownload,
                 pageCount: note.file.pageCount,
                 thumbnailUrl: note.file.thumbnailUrl,
             },

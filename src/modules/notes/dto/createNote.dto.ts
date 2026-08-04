@@ -12,4 +12,5 @@ export interface CreateNoteDto{
     semester:number,
     language?:string,
     isPublic:boolean,
+    canDownload:boolean
 }

@@ -27,10 +27,10 @@ export const mapUpdateNoteResponse = ({
         language: note.language,
         contentType: note.contentType,
         file: {
-            url: note.file.url,
             size: note.file.size,
             mimeType: note.file.mimeType,
             pageCount: note.file.pageCount,
+            canDownload: note.file.canDownload,
             readingTime: note.file.readingTime,
             thumbnailUrl: note.file.thumbnailUrl,
         },
