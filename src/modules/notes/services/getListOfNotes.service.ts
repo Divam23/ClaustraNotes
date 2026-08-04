@@ -1,5 +1,7 @@
-import { ApiError } from '@/shared/utils/ApiError';
+import { NoteCategoryType } from '../constants/noteCategory.constant';
 import Note from '../notes.model';
+import { INote } from '../types/note.types';
+import {QueryFilter} from "mongoose";
 
 type GetNoteListOptions = {
     query?: string;
@@ -7,14 +9,14 @@ type GetNoteListOptions = {
     limit: number;
     subject?: string;
     semester?: number;
-    category?: string;
+    category?: NoteCategoryType;
     course?: string;
 };
 
 export const getNoteList = async (options: GetNoteListOptions) => {
-    const filters: any = {
+    const filters: QueryFilter<INote> = {
         isPublic: true,
-        status: 'published',
+        publishStatus: 'published',
     };
 
     const skip = (options.page - 1) * options.limit;
@@ -46,10 +48,14 @@ export const getNoteList = async (options: GetNoteListOptions) => {
     if (options.course) {
         filters.course = options.course;
     }
+    if (options.subject) {
+        filters.subject = {
+            $regex: options.subject,
+            $options: 'i',
+        };
+    }
 
     const totalResults = await Note.countDocuments(filters);
-
-    if(!totalResults) throw new ApiError(400, "total results count not found")
 
     const notes = await Note.find(filters)
         .select(`title subject category uploader stats file createdAt`)
@@ -65,7 +71,7 @@ export const getNoteList = async (options: GetNoteListOptions) => {
             page: options.page,
             limit: options.limit,
             totalResults,
-            totalPages: Math.ceil(totalResults / options.limit),
+            totalPages: Math.max(1, Math.ceil(totalResults / options.limit)),
         },
     };
 };

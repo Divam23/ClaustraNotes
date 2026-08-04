@@ -15,7 +15,6 @@ import { getCommentsSchema } from '../comments/validators/getComments.validation
 import { getAllTopLevelCommentsController } from '../comments/controllers/getComments.controller';
 import { createCommentSchema } from '../comments/validators/createComment.validation';
 import { createCommentController } from '../comments/controllers/createComment.controller';
-import { objectIdValidationSchema } from '@/shared/validators/objectIdValidation.validator';
 import { toggleNoteLikeController } from '../likes/controllers/toggleNoteLike.controller';
 import { requireVerifiedEmail } from '@/shared/middlewares/requireVerifiedEmail.middleware';
 import { downloadSingleNoteSchema } from '../downloads/validators/download.validation';
