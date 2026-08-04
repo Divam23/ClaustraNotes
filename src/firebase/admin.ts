@@ -5,18 +5,11 @@ import { configDotenv } from "dotenv";
 
 configDotenv();
 
-const serviceAccountPath = path.join(
-  process.cwd(),
-  process.env.FIREBASE_ADMIN_FILE_PATH as string
-);
-
-if(!fs.existsSync(serviceAccountPath)){
-  throw new Error(`Firebase service account file not found at ${serviceAccountPath}`);
-}
-
-const serviceAccount = JSON.parse(
-  fs.readFileSync(serviceAccountPath, 'utf-8')
-);
+const serviceAccount = {
+  projectId: process.env.FIREBASE_PROJECT_ID,
+  clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+  privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
+};
 
 if(!admin.apps.length){
   admin.initializeApp({
