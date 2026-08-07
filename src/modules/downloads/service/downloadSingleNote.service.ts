@@ -15,7 +15,7 @@ export const downloadSingleNote = async (firebaseUid: string, noteId: string) =>
         throw new ApiError(404, 'No note found with this id');
     }
 
-    if (note.publishStatus !== 'published') {
+    if (note.notePublishStatus !== 'published') {
         throw new ApiError(403, 'This note is not published');
     }
 
