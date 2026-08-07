@@ -1,7 +1,6 @@
-import { IUser } from '@/modules/users/types/user.types';
 import { INote } from '../types/note.types';
 
-export const mapNoteListResponse = ({
+export const mapUserUploadedNotes = ({
     notes,
     pagination,
 }: {
@@ -13,34 +12,18 @@ export const mapNoteListResponse = ({
         totalPages: number;
     };
 }) => {
-    const mappedNotes = notes.map((note) => {
-        const uploader = note.uploader as unknown as IUser;
-
+    const mappedNotes = notes.map((note)=>{
         return {
             id: note._id,
             title: note.title,
             subject: note.subject,
             category: note.category,
-            tags: note.tags,
-            course: note.course,
-            university: note.university,
-            semester: note.semester,
-            language: note.language,
-            contentType: note.contentType,
+            isPublic: note.isPublic,
             file: {
                 canDownload: note.file.canDownload,
                 pageCount: note.file.pageCount,
                 thumbnailUrl: note.file.thumbnailUrl,
             },
-
-            uploader: {
-                id: uploader._id,
-                firstName: uploader.firstName,
-                lastName: uploader.lastName,
-                avatar: uploader.avatar,
-                isVerified: uploader.verificationStatus,
-            },
-
             stats: {
                 viewsCount: note.stats?.viewsCount || 0,
                 downloadCount: note.stats?.downloadCount || 0,
@@ -51,11 +34,19 @@ export const mapNoteListResponse = ({
                 commentsCount: note.stats?.commentsCount || 0,
             },
             createdAt: note.createdAt,
+            updatedAt: note.updatedAt,
+            notePublishStatus: note.notePublishStatus,
+            noteVerificationStatus: note.noteVerificationStatus,
+            publishedAt: note.publishedAt,
+            submittedForReviewAt: note.submittedForReviewAt,
+            approvedAt: note.approvedAt,
+            rejectedAt: note.rejectedAt,
+            rejectionReason: note.rejectionReason
         };
     });
 
     return {
         notes: mappedNotes,
-        pagination,
-    };
-};
+        pagination
+    }
+}

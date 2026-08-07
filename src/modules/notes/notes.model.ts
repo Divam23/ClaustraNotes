@@ -169,7 +169,7 @@ const NoteSchema = new Schema<INote>(
             default: true,
         },
 
-        publishStatus: {
+        notePublishStatus: {
             type: String,
             enum: NOTE_PUBLISH_STATUS_ENUM,
             default: 'draft',

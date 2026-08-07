@@ -1,22 +1,15 @@
-import { NoteCategoryType } from '../constants/noteCategory.constant';
+
 import Note from '../notes.model';
+import { GetNoteListOptions } from '../types/getNoteListOptions.types';
 import { INote } from '../types/note.types';
 import {QueryFilter} from "mongoose";
 
-type GetNoteListOptions = {
-    query?: string;
-    page: number;
-    limit: number;
-    subject?: string;
-    semester?: number;
-    category?: NoteCategoryType;
-    course?: string;
-};
+
 
 export const getNoteList = async (options: GetNoteListOptions) => {
     const filters: QueryFilter<INote> = {
         isPublic: true,
-        publishStatus: 'published',
+        notePublishStatus: 'published',
     };
 
     const skip = (options.page - 1) * options.limit;
@@ -49,16 +42,16 @@ export const getNoteList = async (options: GetNoteListOptions) => {
         filters.course = options.course;
     }
     if (options.subject) {
-        filters.subject = {
-            $regex: options.subject,
-            $options: 'i',
-        };
+        filters.subject = options.subject;
+    }
+    if(options.noteContentType){
+        filters.contentType = options.noteContentType;
     }
 
     const totalResults = await Note.countDocuments(filters);
 
     const notes = await Note.find(filters)
-        .select(`title subject category uploader stats file createdAt`)
+        .select(`title subject category uploader stats file createdAt `)
         .populate('uploader', `firstName lastName avatar verificationStatus`)
         .sort({ createdAt: -1 })
         .skip(skip)
@@ -71,7 +64,7 @@ export const getNoteList = async (options: GetNoteListOptions) => {
             page: options.page,
             limit: options.limit,
             totalResults,
-            totalPages: Math.max(1, Math.ceil(totalResults / options.limit)),
+            totalPages: Math.ceil(totalResults / options.limit),
         },
     };
 };

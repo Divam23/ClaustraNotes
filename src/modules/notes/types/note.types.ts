@@ -37,14 +37,20 @@ export interface INote extends Document {
 
     uploader: mongoose.Types.ObjectId;
     isPublic: boolean;
-    publishStatus: NoteStatusType;
-    publishedAt: Date;
-
+    notePublishStatus: NoteStatusType;
+    publishedAt?: Date;
+    submittedForReviewAt?: Date;
+    approvedAt?:Date;
+    rejectedAt?:Date;
+    rejectionReason?:String;
+    noteVerificationStatus:NoteVerificationStatusType;
+    
     stats: {
         viewsCount: number;
         downloadCount: number;
         sharesCount: number;
         likesCount:number;
+        commentsCount: number;
         bookmarksCount:number;
         ratingsAverage: number;
         ratingsCount: number;
@@ -53,13 +59,6 @@ export interface INote extends Document {
         conversionRate: number;
         lastViewedAt: Date;
     };
-
-    submittedForReviewAt: Date;
-    approvedAt:Date;
-    rejectedAt:Date;
-    rejectionReason:String;
-    noteVerificationStatus:NoteVerificationStatusType;
-
     moderation: {
         reportCount: number;
         moderationFlags: NoteModerationFlagsType[];
