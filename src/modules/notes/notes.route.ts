@@ -20,6 +20,9 @@ import { requireVerifiedEmail } from '@/shared/middlewares/requireVerifiedEmail.
 import { downloadSingleNoteSchema } from '../downloads/validators/download.validation';
 import { downloadSingleNoteController } from '../downloads/controllers/downloadSingleNote.controller';
 import { toggleLikeSchema } from '../likes/validators/toggleLike.validation';
+import { getUserIdSchema } from '../users/validators/getUserIdSchema.validation';
+import { getUserUploadedNotesController } from './controllers/getUserUploadedNotes.controller';
+import { getUserUploadedNotesSchema } from './validators/getUserUploadedNotesSchema.validator';
 
 const router = Router();
 
@@ -94,6 +97,16 @@ router
         requireVerifiedEmail,
         validate(downloadSingleNoteSchema),
         downloadSingleNoteController
+    );
+
+//User uploaded notes
+router
+    .route('/me')
+    .get(
+        verifyFirebaseToken,
+        requireVerifiedEmail,
+        validate(getUserUploadedNotesSchema),
+        getUserUploadedNotesController
     );
 
 export default router;
