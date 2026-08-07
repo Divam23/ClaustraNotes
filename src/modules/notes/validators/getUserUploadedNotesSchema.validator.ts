@@ -4,13 +4,12 @@ import { NOTE_CONTENT_TYPE_ENUM } from "../constants/noteContentType.constant";
 
 export const getUserUploadedNotesSchema = z.object({
     query: z.object({
-        query: z.string().min(1).max(300).optional(),
         page: z.coerce.number().min(1).default(1),
         limit: z.coerce.number().min(1).max(50).default(15),
         subject: z.string().min(1).max(400).optional(),
         semester: z.coerce.number().optional(),
-        category: z.enum(NOTE_CATEGORY_ENUM).default("lecture_notes").optional(),
+        category: z.enum(NOTE_CATEGORY_ENUM).optional(),
         course: z.string().optional(),
-        contentType: z.enum(NOTE_CONTENT_TYPE_ENUM).default("pdf").optional(),
+        contentType: z.enum(NOTE_CONTENT_TYPE_ENUM).optional(),
     }),
 });
