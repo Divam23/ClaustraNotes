@@ -11,7 +11,6 @@ const BookmarkSchema = new Schema<IBookmark>(
         },
         targetId: {
             type: Schema.Types.ObjectId,
-
             required: true,
         },
 

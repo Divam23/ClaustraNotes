@@ -1,18 +1,21 @@
-import { INote } from '../types/note.types';
+import { BookmarkNoteAggregation } from "../types/bookmarkNoteAggregation.types";
 
-export const mapUserUploadedNotes = ({
-    notes,
-    pagination,
+export const mapBookmarkListResponse = ({
+    bookmarkNotes,
+    pagination
 }: {
-    notes: INote[];
-    pagination: {
+    bookmarkNotes: BookmarkNoteAggregation[];
+    pagination:{
         page: number;
         limit: number;
-        totalResults: number;
         totalPages: number;
+        totalResults: number;
     };
 }) => {
-    const mappedNotes = notes.map((note)=>{
+    const mappedBookmarks = bookmarkNotes.map((bookmark)=>{
+        const note = bookmark.note;
+        const uploader = bookmark.uploader;
+
         return {
             id: note._id,
             title: note.title,
@@ -33,20 +36,23 @@ export const mapUserUploadedNotes = ({
                 bookmarksCount: note.stats?.bookmarksCount ?? 0,
                 commentsCount: note.stats?.commentsCount ?? 0,
             },
+            uploader:{
+                id: uploader._id,
+                firstName: uploader.firstName,
+                lastName: uploader.lastName,
+                avatar: uploader.avatar,
+                verificationStatus: uploader.verificationStatus,
+            },
             createdAt: note.createdAt,
             updatedAt: note.updatedAt,
-            notePublishStatus: note.notePublishStatus,
+            bookmarkedAt: bookmark.createdAt,
             noteVerificationStatus: note.noteVerificationStatus,
             publishedAt: note.publishedAt,
-            submittedForReviewAt: note.submittedForReviewAt,
-            approvedAt: note.approvedAt,
-            rejectedAt: note.rejectedAt,
-            rejectionReason: note.rejectionReason
         };
     });
 
     return {
-        notes: mappedNotes,
+        bookmarks: mappedBookmarks,
         pagination
     }
 }
