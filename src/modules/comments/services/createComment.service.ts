@@ -3,6 +3,7 @@ import User from '@/modules/users/models/users.model';
 import Note from '@/modules/notes/notes.model';
 import { ApiError } from '@/shared/utils/ApiError';
 import { CreateCommentDto } from '../dto/createComment.dto';
+import mongoose from 'mongoose';
 
 export const createCommentOrReply = async ({
     firebaseUid,
@@ -43,43 +44,60 @@ export const createCommentOrReply = async ({
         }
     }
 
-    const comment = await Comment.create({
-        note: note._id,
-        user: user._id,
-        content: commentData.content,
-        parentComment: commentData.parentComment || null,
-    });
-
-    //populate user from comment
-    const populatedComment = await Comment.findById(comment._id).populate({
-        path: 'user',
-        select: [
-            'firebaseUid',
-            'firstName',
-            'lastName',
-            'userName',
-            'avatar',
-            'verificationStatus',
-        ].join(' '),
-    });
-
-    const updatePromises: Promise<any>[] = [
-        Note.findByIdAndUpdate(note._id, {
-            $inc: {
-                'stats.commentsCount': 1,
-            },
-        }).exec(),
-    ];
-
+    const session = await mongoose.startSession();
     
-    if (parentCommentDoc) {
-        updatePromises.push(
-            Comment.findByIdAndUpdate(parentCommentDoc._id, {
-                $inc: { 'stats.repliesCount': 1 },
-            }).exec()
-        );
-    }
-    await Promise.all(updatePromises);
+    try {
+        session.startTransaction();
 
-    return populatedComment;
+        const comment = await Comment.create({
+            note: note._id,
+            user: user._id,
+            content: commentData.content,
+            parentComment: commentData.parentComment || null,
+        });
+        await comment.save({session});
+
+        await Note.findByIdAndUpdate(
+            note._id, 
+            {
+                $inc: {
+                    'stats.commentsCount': 1,
+                },
+            },
+            {session}
+        );
+    
+        if(parentCommentDoc !== null){
+            await Comment.findByIdAndUpdate(parentCommentDoc._id, 
+                {
+                    $inc: { 'stats.repliesCount': 1 },
+                },
+                {session}
+            );
+        }
+        await session.commitTransaction();
+
+        //populate user from comment
+        const populatedComment = await Comment.findById(comment._id).populate({
+            path: 'user',
+            select: [
+                'firebaseUid',
+                'firstName',
+                'lastName',
+                'userName',
+                'avatar',
+                'verificationStatus',
+            ].join(' '),
+        });
+
+        return populatedComment;
+
+    } catch (error) {
+        await session.abortTransaction();
+        throw error;
+    }
+    finally{
+        await session.endSession();
+    }
+
 };

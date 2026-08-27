@@ -1,29 +1,27 @@
-import User from '@/modules/users/models/users.model';
-import { ApiError } from '@/shared/utils/ApiError';
-import { GetBookmarkOptions } from '../types/getAllBookmarkOptions.types';
-import { QueryFilter, PipelineStage } from 'mongoose';
+import User from "@/modules/users/models/users.model";
+import { GetDownloadedNotesOptions } from "../types/getAllDownloads.types";
+import { ApiError } from "@/shared/utils/ApiError";
+import { QueryFilter } from "mongoose";
+import { IDownload } from "../types/download.types";
+import { PipelineStage } from "mongoose";
+import Download from "../model/download.model";
 
-import { IBookmark } from '../types/bookmark.types';
-import Bookmark from '../model/bookmark.model';
-
-export const getAllBookmarks = async ({
+export const getAllDownloadedNotes = async({
     firebaseUid,
     options,
 }: {
     firebaseUid: string;
-    options: GetBookmarkOptions;
+    options: GetDownloadedNotesOptions
 }) => {
-    const user = await User.findOne({ firebaseUid }).lean();
+    const user =  await User.findOne({firebaseUid}).lean();
 
     if (!user) {
         throw new ApiError(404, 'User not found');
     }
 
-    const filters: QueryFilter<IBookmark> = {
+    const filters: QueryFilter<IDownload> = {
         user: user._id,
-        targetType: 'Note',
-
-    };
+    }
 
     const skip = (options.page - 1) * options.limit;
 
@@ -32,22 +30,22 @@ export const getAllBookmarks = async ({
             $match: filters,
         },
         {
-            $lookup: {
+            $lookup:{
                 from: 'notes',
-                localField: 'targetId',
+                localField: 'note',
                 foreignField: '_id',
-                as: 'note',
+                as: 'note'
             },
-        },
 
+        },
         {
-            $unwind: '$note',
+            $unwind: '$note'
         },
         {
             $lookup:{
                 from: 'users',
-                let: { uploaderId: '$note.uploader' },
-                pipeline:[
+                let: {uploaderId: '$note.uploader'},
+                pipeline: [
                     {
                         $match:{
                             $expr:{
@@ -69,7 +67,7 @@ export const getAllBookmarks = async ({
             }
         },
         {
-            $unwind: 'uploader'
+            $unwind: '$uploader'
         },
         {
             $match:{
@@ -114,10 +112,10 @@ export const getAllBookmarks = async ({
 
     pipeline.push({
         $facet: {
-            bookmarks: [
+            downloads: [
                 {
-                    $sort: {
-                        createdAt: -1,
+                    $sort:{
+                        createdAt: -1
                     },
                 },
                 {
@@ -125,31 +123,27 @@ export const getAllBookmarks = async ({
                 },
                 {
                     $limit: options.limit,
-                },
+                }
             ],
             metadata: [
                 {
                     $count: 'totalResults',
                 },
             ],
-        },
+        }
     });
 
-
-    const result = await Bookmark.aggregate(pipeline);
-
-    const bookmarksData = result[0]?.bookmarks ?? [];
+    const result = await Download.aggregate(pipeline);
+    const downloadedNotesData = result[0]?.downloads ?? [];
     const totalResults = result[0]?.metadata[0]?.totalResults ?? 0;
 
-
     return {
-        bookmarks: bookmarksData,
-        pagination:{
+        downloads: downloadedNotesData,
+        pagination: {
             totalResults,
             page: options.page,
             limit: options.limit,
-            totalPages: Math.ceil(totalResults / options.limit)
+            totalPages: Math.ceil(totalResults/options.limit)
         }
-        
-    };
+    }
 };

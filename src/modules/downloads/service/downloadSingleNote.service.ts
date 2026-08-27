@@ -3,6 +3,7 @@ import Note from '@/modules/notes/notes.model';
 import { ApiError } from '@/shared/utils/ApiError';
 import Download from '../model/download.model';
 import firebaseProvider from '@/infrastructure/storage/providers/firebase.provider';
+import mongoose from 'mongoose';
 
 export const downloadSingleNote = async (firebaseUid: string, noteId: string) => {
     const user = await User.findOne({ firebaseUid });
@@ -28,12 +29,15 @@ export const downloadSingleNote = async (firebaseUid: string, noteId: string) =>
     if (!isOwner && !note.isPublic) {
         throw new ApiError(403, 'You do not have permission to download this note.');
     }
-
+    const session = await mongoose.startSession();
     try {
-        await Download.create({
+        session.startTransaction();
+
+        const download = await Download.create({
             user: user._id,
             note: note._id,
         });
+        await download.save({session});
 
         await Note.findByIdAndUpdate(
             note._id,
@@ -42,11 +46,18 @@ export const downloadSingleNote = async (firebaseUid: string, noteId: string) =>
                     'stats.downloadCount': 1,
                 },
             },
-        ).lean();
+            {session}
+        );
+        await session.commitTransaction();
+
     } catch (error: any) {
+        session.abortTransaction();
         if (error.code !== 11000) {
             throw error;
         }
+    }
+    finally{
+        session.endSession();
     }
 
     const signedUrl = await firebaseProvider.generateSignedDownloadUrl(note.file.storagePath);

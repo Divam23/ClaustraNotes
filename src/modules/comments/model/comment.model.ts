@@ -43,13 +43,11 @@ const commentSchema = new Schema<IComment>(
         },
         isEdited: {
             type: Boolean,
-
             default: false,
         },
 
         editedAt: {
             type: Date,
-
             default: null,
         },
         moderation: {
