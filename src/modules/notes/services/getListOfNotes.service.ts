@@ -10,6 +10,7 @@ export const getNoteList = async (options: GetNoteListOptions) => {
     const filters: QueryFilter<INote> = {
         isPublic: true,
         notePublishStatus: 'published',
+        isDeleted: false,
     };
 
     const skip = (options.page - 1) * options.limit;

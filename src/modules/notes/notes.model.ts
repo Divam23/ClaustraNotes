@@ -133,7 +133,7 @@ const NoteSchema = new Schema<INote>(
 
             canDownload: {
                 type: Boolean,
-                default: false
+                default: false,
             },
 
             pageCount: {
@@ -279,18 +279,33 @@ const NoteSchema = new Schema<INote>(
 
         // Moderation
         moderation: {
+            isDeleted: {
+                type: Boolean,
+                default: false,
+            },
+            deletedAt: {
+                type: Date,
+                default: null,
+            },
+            deletedBy: {
+                type: Schema.Types.ObjectId,
+                ref: 'User',
+                default: null,
+            },
+            deletionReason: {
+                type: String,
+                default: null,
+            },
             reportCount: {
                 type: Number,
                 default: 0,
                 min: 0,
             },
-
             moderationFlags: [
                 {
                     type: String,
                     enum: MODERATION_FLAGS_ENUM,
                 },
-
             ],
         },
     },
@@ -350,7 +365,6 @@ NoteSchema.set('toObject', {
     virtuals: true,
 });
 
-
 // Methods
 NoteSchema.methods.calculateEngagementScore = function () {
     const views = this.stats?.viewsCount || 0;
@@ -384,10 +398,10 @@ NoteSchema.pre('validate', function () {
 
     if (status === 'pending_review') {
         if (!this.submittedForReviewAt) {
-            throw new Error('pending_review notes must have submittedForReviewAt set');
+            throw new Error('pending review notes must have submittedForReviewAt set');
         }
         if (this.approvedAt || this.rejectedAt) {
-            throw new Error('pending_review notes cannot have approvedAt/rejectedAt set');
+            throw new Error('pending review notes cannot have approvedAt/rejectedAt set');
         }
     }
 

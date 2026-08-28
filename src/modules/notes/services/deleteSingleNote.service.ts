@@ -1,7 +1,6 @@
 import Note from '../notes.model';
 import User from '@/modules/users/models/users.model';
 import { ApiError } from '@/shared/utils/ApiError';
-import firebaseStorageProvider from '@/infrastructure/storage/providers/firebase.provider';
 
 export const deleteSingleNote = async (firebaseUid: string, noteId: string) => {
     const user = await User.findOne({ firebaseUid }).lean();
@@ -21,24 +20,22 @@ export const deleteSingleNote = async (firebaseUid: string, noteId: string) => {
         throw new ApiError(403, 'You cannot delete this note');
     }
 
-    //try deleting file
+    //changing the delete status of file (soft deletion)
     try {
-        if (note.file?.storagePath) {
-            await firebaseStorageProvider.deleteFile(note.file.storagePath);
-        }
-
-        if (note.file?.thumbnailUrl) {
-            await firebaseStorageProvider.deleteFile(note.file.thumbnailUrl);
-        }
-
-        await Note.findByIdAndDelete(noteId);
-
+        await Note.findByIdAndUpdate(noteId, {
+            $set:{
+                'moderation.isDeleted': true,
+                'moderation.deletedAt': new Date(),
+                'moderation.deletedby': user._id,
+                'moderation.deletionReason': null
+            }
+        })
         return {
             deleted: true,
             noteId,
         };
     } catch (error) {
-        console.error('Firebase cleanup failed', error);
+        console.error('Deletion of the note failed', error);
 
         throw new ApiError(500, 'Failed to delete note files');
     }

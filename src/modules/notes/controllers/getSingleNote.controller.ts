@@ -18,6 +18,7 @@ export const getSingleNoteController = asyncHandler(
             note: result.note,
             isLiked: result.isLiked,
             isBookmarked: result.isBookmarked,
+            isDownloaded: result.isDownloaded,
             isOwner: result.isOwner,
         });
 

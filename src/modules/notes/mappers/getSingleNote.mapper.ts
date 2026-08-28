@@ -5,11 +5,13 @@ export const mapSingleNoteResponse = ({
     note,
     isLiked,
     isBookmarked,
+    isDownloaded,
     isOwner,
 }: {
     note: INote;
     isLiked: boolean;
     isBookmarked: boolean;
+    isDownloaded: boolean;
     isOwner: boolean;
 }) => {
     const uploader = note.uploader as unknown as IUser;
@@ -43,15 +45,16 @@ export const mapSingleNoteResponse = ({
             isVerified: uploader.verificationStatus,
         },
         stats: {
-            viewsCount: note.stats?.viewsCount || 0,
-            downloadCount: note.stats?.downloadCount || 0,
-            ratingsAverage: note.stats?.ratingsAverage || 0,
-            ratingsCount: note.stats?.ratingsCount || 0,
-            likesCount: note.stats.likesCount || 0,
-            bookmarksCount: note.stats.bookmarksCount || 0,
+            viewsCount: note.stats?.viewsCount ?? 0,
+            downloadCount: note.stats?.downloadCount ?? 0,
+            ratingsAverage: note.stats?.ratingsAverage ?? 0,
+            ratingsCount: note.stats?.ratingsCount ?? 0,
+            likesCount: note.stats.likesCount ?? 0,
+            bookmarksCount: note.stats.bookmarksCount ?? 0,
         },
         isLiked,
         isBookmarked,
+        isDownloaded,
         isOwner,
         createdAt:note.createdAt,
         updatedAt:note.updatedAt

@@ -60,6 +60,10 @@ export interface INote extends Document {
         lastViewedAt: Date;
     };
     moderation: {
+        isDeleted:boolean;
+        deletedAt:Date;
+        deletedBy:mongoose.Types.ObjectId;
+        deletionReason:string;
         reportCount: number;
         moderationFlags: NoteModerationFlagsType[];
         moderatedBy: mongoose.Types.ObjectId;

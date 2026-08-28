@@ -7,10 +7,10 @@ import { GetNoteListOptions } from '../types/getNoteListOptions.types';
 
 export const getUserUploadedNotes = async ({
     firebaseUid,
-    options
+    options,
 }: {
     firebaseUid: string;
-    options: GetNoteListOptions
+    options: GetNoteListOptions;
 }) => {
     const user = await User.findOne({ firebaseUid }).lean();
 
@@ -20,37 +20,36 @@ export const getUserUploadedNotes = async ({
 
     const filters: QueryFilter<INote> = {
         uploader: user._id,
+    };
+
+    const skip = (options.page - 1) * options.limit;
+
+    if (options.category) {
+        filters.category = options.category;
     }
 
-    const skip = (options.page -1) * options.limit;
-
-    if(options.category){
-        filters.category = options.category
-    }
-
-    if(options.noteContentType){
+    if (options.noteContentType) {
         filters.contentType = options.noteContentType;
     }
 
-
     const totalResults = await Note.countDocuments(filters);
 
-    const notes = await Note.find(filters).select(
-        `title subject category uploader stats file createdAt updatedAt isPublic notePublishStatus noteVerificationStatus publishedAt submittedForReviewAt approvedAt rejectedAt rejectionReason`
-    )
-    .sort({createdAt: -1})
-    .skip(skip)
-    .limit(options.limit)
-    .lean();
+    const notes = await Note.find(filters)
+        .select(
+            `title subject category uploader stats file createdAt updatedAt isPublic notePublishStatus noteVerificationStatus publishedAt submittedForReviewAt approvedAt rejectedAt rejectionReason`
+        )
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(options.limit)
+        .lean();
 
     return {
         notes,
-        pagination:{
+        pagination: {
             page: options.page,
             limit: options.limit,
             totalResults,
-            totalPages: Math.ceil(totalResults/options.limit),
-        }
-    }
-
+            totalPages: Math.ceil(totalResults / options.limit),
+        },
+    };
 };

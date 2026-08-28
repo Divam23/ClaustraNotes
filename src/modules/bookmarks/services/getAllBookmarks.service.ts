@@ -74,7 +74,8 @@ export const getAllBookmarks = async ({
         {
             $match:{
                 'note.isPublic': true,
-                'note.notePublishStatus': 'published'
+                'note.notePublishStatus': 'published',
+                'note.moderation?.isDeleted': false
             }
         }
     ];
