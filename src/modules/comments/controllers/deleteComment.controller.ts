@@ -5,7 +5,7 @@ import { ApiError } from "@/shared/utils/ApiError";
 import { ApiResponse } from "@/shared/utils/ApiResponse";
 
 export const deleteCommentController = asyncHandler(async (req:Request, res:Response) => {
-    const firebaseUid=req.user?.uid as string;
+    const firebaseUid=req.user?.firebaseUid as string;
     const commentId = req.params.commentId as string;
 
     const result = await deleteComment({firebaseUid, commentId});

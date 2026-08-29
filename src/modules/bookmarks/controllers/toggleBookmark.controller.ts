@@ -10,7 +10,7 @@ export const toggleBookmarkController = asyncHandler(async (req: Request, res: R
         throw new ApiError(404, 'No user found');
     }
 
-    const firebaseUid = req.user.uid;
+    const firebaseUid = req.user.firebaseUid;
     const targetType = req.params.targetType as BookmarkEntityType;
     const targetId = req.params.targetId as string;
 

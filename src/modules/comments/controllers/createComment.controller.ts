@@ -8,7 +8,7 @@ import { ApiResponse } from '@/shared/utils/ApiResponse';
 
 export const createCommentController = asyncHandler(async (req: Request, res: Response) => {
     if (!req.user) throw new ApiError(404, 'User not found');
-    const firebaseUid = req.user.uid;
+    const firebaseUid = req.user.firebaseUid;
     const noteId = req.params.noteId as string;
     const commentData = req.body as CreateCommentDto;
     const createdComment = await createCommentOrReply({ firebaseUid, noteId, commentData });

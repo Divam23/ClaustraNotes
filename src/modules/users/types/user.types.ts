@@ -19,7 +19,7 @@ export interface IUser extends Document {
     university: string;
     semester: number;
     verificationStatus: VerificationType;
-    roles: RoleType;
+    roles: RoleType[];
     preferences: {
         language: string;
         theme: 'light' | 'dark' | 'system';

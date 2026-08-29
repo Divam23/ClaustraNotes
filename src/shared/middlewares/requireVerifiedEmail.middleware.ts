@@ -6,7 +6,7 @@ export const requireVerifiedEmail = (
     res: Response,
     next: NextFunction
 ) => {
-    if (!req.user?.email_verified) {
+    if (!req.firebaseUser?.email_verified) {
         return next(
             new ApiError(
                 403,

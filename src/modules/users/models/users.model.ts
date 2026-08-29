@@ -47,9 +47,10 @@ const UserSchema = new Schema(
         avatar: {
             url: {
                 type: String,
+                default: '',
                 validate: {
                     validator: function (v: string) {
-                        return /^https?:\/\/.+/.test(v);
+                        return v === '' || /^https?:\/\/.+/.test(v);
                     },
                     message: 'Invalid avatar URL',
                 },
@@ -57,7 +58,7 @@ const UserSchema = new Schema(
 
             storagePath: {
                 type: String,
-                required: true,
+                default: ''
             },
         },
 
@@ -101,10 +102,11 @@ const UserSchema = new Schema(
             type: Number,
             min: 1,
             max: 10,
+            default: 1
         },
 
         roles: {
-            type: String,
+            type: [String],
             enum: ROLE_ENUM,
             default: 'student',
             required: true,
@@ -120,12 +122,6 @@ const UserSchema = new Schema(
             enum: VERIFICATION_ENUM,
             default: 'not_verified',
             required: true,
-            validate: {
-                validator: function (v: string[]) {
-                    return Array.isArray(v) && v.length > 0;
-                },
-                message: 'A user must have a status of verification.',
-            },
         },
 
         // Preferences
@@ -236,10 +232,6 @@ UserSchema.pre('save', async function () {
     if (doc.moderation?.banUntil && doc.moderation.banUntil <= new Date()) {
         doc.moderation.isBanned = false;
         doc.moderation.banUntil = null;
-    }
-    // roles normalization added by setter; ensure at least one role
-    if (!doc.roles || doc.roles.length === 0) {
-        doc.roles = 'student';
     }
 });
 

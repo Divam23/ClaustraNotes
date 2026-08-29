@@ -15,7 +15,7 @@ export const uploadNote = asyncHandler(async (req: Request, res: Response) => {
   }
 
   const note = await noteService.createNote({
-    firebaseUid: req.user!.uid,
+    firebaseUid: req.user!.firebaseUid,
     noteData: req.body,
     uploadedFile: req.file,
   });

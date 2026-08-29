@@ -12,7 +12,7 @@ const verifyFirebaseToken = asyncHandler (async(req:Request, res:Response, next:
     const token = authHeaders?.split(" ")[1];
     const decodedToken = await admin.auth().verifyIdToken(token);
 
-    req.user = decodedToken;
+    req.firebaseUser=decodedToken;
     next();
 
 })

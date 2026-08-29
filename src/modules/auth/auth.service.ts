@@ -5,6 +5,7 @@ import { generateDefaultUserName } from '@/shared/helpers/generateDefaultUsernam
 import { ApiError } from '@/shared/utils/ApiError';
 
 export const findOrCreateUser = async (decodedUser: DecodedIdToken) => {
+
     let user = await User.findOne({
         firebaseUid: decodedUser.uid,
     });
@@ -33,7 +34,6 @@ export const findOrCreateUser = async (decodedUser: DecodedIdToken) => {
             userName: generartedUsername,
             avatar: {
                 url: decodedUser.picture || '',
-
                 storagePath: '',
             },
         });

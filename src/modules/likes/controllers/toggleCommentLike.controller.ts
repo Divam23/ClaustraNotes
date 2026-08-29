@@ -9,7 +9,7 @@ export const toggleCommentLikeController = asyncHandler(async (req: Request, res
         throw new ApiError(404, 'No user found');
     }
 
-    const firebaseUid = req.user.uid;
+    const firebaseUid = req.user.firebaseUid;
     const commentId = req.params.commentId as string;
 
     const response = await toggleLike(

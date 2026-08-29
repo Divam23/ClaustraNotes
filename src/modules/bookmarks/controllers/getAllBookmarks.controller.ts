@@ -6,7 +6,7 @@ import { mapBookmarkListResponse } from '../mappers/getAllBookmarks.mapper';
 import { ApiResponse } from '@/shared/utils/ApiResponse';
 
 export const getAllBookmarksController = asyncHandler(async (req: Request, res: Response) => {
-    const firebaseUid = req.user?.uid as string;
+    const firebaseUid = req.user?.firebaseUid as string;
     const options = req.query as unknown as GetBookmarkOptions;
 
     const result = await getAllBookmarks({ firebaseUid, options });

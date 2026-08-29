@@ -9,7 +9,7 @@ export const toggleNoteLikeController = asyncHandler(async (req: Request, res: R
         throw new ApiError(404, 'No user found');
     }
 
-    const firebaseUid = req.user.uid;
+    const firebaseUid = req.user.firebaseUid;
     const noteId = req.params.noteId as string;
 
 

@@ -6,7 +6,7 @@ import { getAllDownloadedNotes } from '../service/getAllDownloadedNotes.service'
 import { mapDownloadedNotesResponse } from '../mappers/getAllDownloadedNotes.mapper';
 
 export const getAllDownloadedNotesController = asyncHandler(async (req: Request, res: Response) => {
-    const firebaseUid = req.user?.uid as string;
+    const firebaseUid = req.user?.firebaseUid as string;
     const options = req.query as unknown as GetDownloadedNotesOptions;
 
     const result = await getAllDownloadedNotes({ firebaseUid, options });

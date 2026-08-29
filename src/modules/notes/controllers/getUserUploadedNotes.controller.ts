@@ -23,7 +23,7 @@ export const getUserUploadedNotesController = asyncHandler(async (req: Request, 
     const course = (req.query.course as string) || undefined;
     const noteContentType = req.query.noteContentType as NoteContentType;
 
-    const firebaseUid = req.user.uid;
+    const firebaseUid = req.user.firebaseUid;
     const options = { query, page, limit, subject, semester, category, course, noteContentType };
 
     const filteredNotes = await getUserUploadedNotes(

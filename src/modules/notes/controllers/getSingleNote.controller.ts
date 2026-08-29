@@ -12,7 +12,7 @@ export const getSingleNoteController = asyncHandler(
             throw new ApiError(401, 'Unauthorized');
         }
 
-        const result = await getSingleNoteData(req.user.uid, req.params.noteId as string);
+        const result = await getSingleNoteData(req.user.firebaseUid, req.params.noteId as string);
 
         const response = mapSingleNoteResponse({
             note: result.note,

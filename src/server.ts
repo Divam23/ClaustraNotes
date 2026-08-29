@@ -6,14 +6,18 @@ configDotenv();
 
 const PORT = process.env.PORT || 1500;
 
-connectDB().then(
-    ()=>{
-        app.listen(PORT, ()=>{
-            console.log(`Server is running on PORT:${PORT}`)
-        } )
+const startServer = async()=>{
+    try {
+        await connectDB();
+
+        const server = app.listen(PORT, () => {
+            console.log(`Server is running on PORT: ${PORT}`);
+        });
+    } catch (error) {
+        console.error("Failed to start server:", error);
+        process.exit(1);
     }
-).catch(
-    (error)=>{
-        console.log("Mongo DB Connection failed---", error)
-    }
-)
+};
+
+startServer();
+

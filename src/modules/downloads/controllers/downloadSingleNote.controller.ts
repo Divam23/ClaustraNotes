@@ -10,7 +10,7 @@ export const downloadSingleNoteController = asyncHandler(
             throw new ApiError(404, 'User not found');
         }
 
-        const firebaseUid = req.user.uid;
+        const firebaseUid = req.user.firebaseUid;
         const noteId = req.params.noteId as string;
 
         const response = await downloadSingleNote(firebaseUid, noteId);

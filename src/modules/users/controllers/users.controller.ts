@@ -14,7 +14,7 @@ export const getCurrentUserPersonalProfile = asyncHandler(async (req: Request, r
   if (!req.user) {
     throw new ApiError(401, 'Unauthorized');
   }
-  const user = await getPersonalProfile(req.user?.uid!);
+  const user = await getPersonalProfile(req.user?.firebaseUid!);
   return res.status(200).json(new ApiResponse(200, mapPersonalProfileResponse(user)));
 });
 
@@ -22,12 +22,12 @@ export const getCurrentUserPublicProfile = asyncHandler(async (req: Request, res
   if (!req.user) {
     throw new ApiError(401, 'Unauthorized');
   }
-  const user = await getPublicProfile(req.user?.uid!);
+  const user = await getPublicProfile(req.user?.firebaseUid!);
   return res.status(200).json(new ApiResponse(200, mapPublicProfileResponse(user)));
 });
 
 export const updateCurrentUserProfile = asyncHandler(async (req: Request, res: Response) => {
-  const updatedUserProfile = await updateUserProfile(req.user!.uid, req.body);
+  const updatedUserProfile = await updateUserProfile(req.user!.firebaseUid, req.body);
 
   return res
     .status(200)
@@ -45,7 +45,7 @@ export const updateUserProfileAvatar = asyncHandler(async (req: Request, res: Re
     throw new ApiError(400, 'Avatar file is required');
   }
 
-  const updatedUserAvatar = await updateProfileAvatar(req.user!.uid, req.file);
+  const updatedUserAvatar = await updateProfileAvatar(req.user!.firebaseUid, req.file);
 
   return res.status(200).json(new ApiResponse(200, updatedUserAvatar, "Avatar uploaded successfully!"))
 });

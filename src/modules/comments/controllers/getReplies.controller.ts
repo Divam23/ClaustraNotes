@@ -10,7 +10,7 @@ export const getRepliesOnCommentsController = asyncHandler(async (req: Request, 
     const commentId = req.params.commentId as string;
     const page = Number(req.query.page) || 1;
     const limit = Number(req.query.limit) || 20;
-    const currentFirebaseUid = req.user?.uid;
+    const currentFirebaseUid = req.user?.firebaseUid;
 
     const result = await getRepliesOnComments({ commentId, page, limit });
 

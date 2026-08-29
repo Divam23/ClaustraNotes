@@ -7,7 +7,7 @@ import { ApiError } from "@/shared/utils/ApiError";
 import { UpdateCommentDto } from "../dto/updateComment.dto";
 
 export const updateCommentController = asyncHandler(async(req:Request, res:Response)=>{
-    const firebaseUid = req.user?.uid as string;
+    const firebaseUid = req.user?.firebaseUid as string;
     const commentId = req.params.commentId as string;
     const commentData = req.body.comment as UpdateCommentDto;
 
