@@ -1,5 +1,5 @@
 import {Router} from "express";
-import authRoutes from "@/modules/auth/auth.routes";
+import authRoutes from "@/modules/auth/routes/auth.routes";
 import userRoutes from "@/modules/users/routes/users.routes"
 import noteRoutes from "@/modules/notes/notes.route"
 import bookmarkRoutes from "@/modules/bookmarks/routes/bookmark.routes"

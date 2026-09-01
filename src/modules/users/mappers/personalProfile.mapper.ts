@@ -1,6 +1,7 @@
 import { IUser } from "../types/user.types";
 
 export const mapPersonalProfileResponse = (user: IUser) => ({
+    id: user._id.toString(),
     firstName: user.firstName,
     lastName: user.lastName,
     email: user.email,
@@ -16,7 +17,6 @@ export const mapPersonalProfileResponse = (user: IUser) => ({
     roles: user.roles,
     preferences: user.preferences,
     stats: user.stats,
-    moderation: user.moderation,
-    lastLoginAt: user.lastLoginAt,
+    createdAt: user.createdAt,
     lastUpdatedAt:user.updatedAt
 });
