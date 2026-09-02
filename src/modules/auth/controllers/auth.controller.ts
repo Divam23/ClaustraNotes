@@ -6,7 +6,6 @@ import { mappedAuthenticatedUser } from "../mappers/authUser.mapper";
 import { ApiError } from "@/shared/utils/ApiError";
 
 export const authenticateUserController = asyncHandler(async(req: Request, res:Response)=>{
-
     const user = await findOrCreateUser(req.firebaseUser!);
     if(!user){
         throw new ApiError(500, "Failed to create or retrieve user");

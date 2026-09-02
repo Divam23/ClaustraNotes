@@ -19,5 +19,5 @@ export const mappedAuthenticatedUser = ({user}:{user:IUser
     preferences: user.preferences,
     stats: user.stats,
     createdAt: user.createdAt,
-    lastUpdatedAt:user.updatedAt
+    updatedAt:user.updatedAt
 });
