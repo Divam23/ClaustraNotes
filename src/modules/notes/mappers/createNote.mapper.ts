@@ -22,10 +22,13 @@ export const mapCreateNoteResponse = ({
         category: note.category,
         tags: note.tags,
         course: note.course,
+        branch: note.branch,
+        college: note.collegeName,
         university: note.university,
         semester: note.semester,
         language: note.language,
         contentType: note.contentType,
+
         file: {
             size: note.file.size,
             mimeType: note.file.mimeType,
@@ -43,17 +46,22 @@ export const mapCreateNoteResponse = ({
             isVerified: uploader.verificationStatus,
         },
         stats: {
-            viewsCount: note.stats?.viewsCount || 0,
-            downloadCount: note.stats?.downloadCount || 0,
-            ratingsAverage: note.stats?.ratingsAverage || 0,
-            ratingsCount: note.stats?.ratingsCount || 0,
-            likesCount: note.stats?.likesCount || 0,
-            bookmarksCount: note.stats?.bookmarksCount || 0,
+            viewsCount: note.stats?.viewsCount ?? 0,
+            downloadCount: note.stats?.downloadCount ?? 0,
+            ratingsAverage: note.stats?.ratingsAverage ?? 0,
+            ratingsCount: note.stats?.ratingsCount ?? 0,
+            likesCount: note.stats?.likesCount ?? 0,
+            bookmarksCount: note.stats?.bookmarksCount ?? 0,
         },
-        isLiked,
-        isBookmarked,
-        isOwner,
-        createdAt:note.createdAt,
-        updatedAt:note.updatedAt
+        isPublic: note.isPublic,
+        noteVerificationStatus: note.noteVerificationStatus,
+        notePublishStatus: note.notePublishStatus,
+        publishedAt: note.publishedAt,
+
+        isLiked: isLiked,
+        isBookmarked: isBookmarked,
+        isOwner: isOwner,
+        createdAt: note.createdAt,
+        updatedAt: note.updatedAt
     };
 };

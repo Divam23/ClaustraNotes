@@ -13,11 +13,11 @@ export interface INote extends Document {
     title: string;
     description: string;
     subject: string;
-    branch: string;
+    branch?: string;
     category: NoteCategoryType;
     contentType: NoteContentType;
     tags?: string[];
-    course?: string;
+    course: string;
     university?: string;
     collegeName?:string;
     semester?: number;
