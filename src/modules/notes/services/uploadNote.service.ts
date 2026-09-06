@@ -6,7 +6,7 @@ import { getNoteContentType } from '@/infrastructure/storage/utils/getNoteConten
 import { generateNoteFilePath } from '@/infrastructure/storage/utils/filePathGenerator';
 import firebaseStorageProvider from '@/infrastructure/storage/providers/firebase.provider';
 import { CreateNoteDto } from '../dto/createNote.dto';
-import { supportsThumbnailGeneration } from '@/shared/helpers/supportedFileTypeForThumbnail';
+import { supportedThumbnailGenerationFormats } from '@/shared/helpers/supportedFileTypeForThumbnail';
 
 export const createNote = async ({
     firebaseUid,
@@ -36,6 +36,11 @@ export const createNote = async ({
     const path = generateNoteFilePath(user._id.toString(), uploadedFile.originalname);
 
     try {
+        await firebaseStorageProvider.uploadFile(
+            uploadedFile.buffer,
+            path,
+            uploadedFile.mimetype
+        );
 
         const note = await Note.create({
             ...noteData,
@@ -46,9 +51,10 @@ export const createNote = async ({
             },
             contentType,
             uploader: user._id,
-        });
-
+        }); 
+        
         return note;
+
     } catch (error) {
         if (path) {
             try {

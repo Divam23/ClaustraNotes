@@ -1,3 +1,3 @@
-export const supportsThumbnailGeneration = (contentType: string) => {
+export const supportedThumbnailGenerationFormats = (contentType: string) => {
     return ['pdf', 'docx', 'pptx'].includes(contentType);
 };
