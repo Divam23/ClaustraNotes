@@ -40,7 +40,7 @@ export const mapUpdateNoteResponse = ({
             lastName: uploader.lastName,
             userName: uploader.userName,
             avatar: uploader.avatar,
-            isVerified: uploader.verificationStatus,
+            verificationStatus: uploader.verificationStatus,
         },
         stats: {
             viewsCount: note.stats?.viewsCount || 0,
